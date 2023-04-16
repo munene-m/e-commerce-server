@@ -1,10 +1,10 @@
 import asyncHandler from "express-async-handler"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
-import authModel from "../models/auth"
+import authModel from "../models/auth.js"
 
 //Register user
-const registerUser = asyncHandler(async (req, res) => {
+export const registerUser = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body;
 
   if (!username || !email || !password)  {
@@ -42,7 +42,7 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 //Log in user
-const loginUser = asyncHandler(async (req, res) => {
+export const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -68,12 +68,12 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 //forgot password
-const forgotPassword = asyncHandler(async (req, res) => {
+export const forgotPassword = asyncHandler(async (req, res) => {
 
 });
 
 // update user details
-const updateUser = asyncHandler( async( req, res ) => {
+export const updateUser = asyncHandler( async( req, res ) => {
   const user = await authModel.findById(req.params.id);
 
   if(!user) {
@@ -85,7 +85,7 @@ const updateUser = asyncHandler( async( req, res ) => {
   res.status(200).json(updatedUser);
 });
 
-const getCredentials = asyncHandler(async (req, res) => {
+export const getCredentials = asyncHandler(async (req, res) => {
   res.status(200).json(req.user);
 });
 
@@ -95,7 +95,7 @@ const generateToken = (id) => {
   });
 };
 
-module.exports = {
+export default {
   registerUser,
   loginUser,
   forgotPassword,

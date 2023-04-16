@@ -20,4 +20,4 @@ const productSchema = mongoose.Schema({
     }
 })
 
-module.exports = mongoose.model("authSchema", authSchema)
+export default mongoose.model("products", productSchema)
