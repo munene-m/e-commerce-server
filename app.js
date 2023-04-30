@@ -7,7 +7,7 @@ import authRoute from './routes/authRoutes.js'
 import productRoute from './routes/productRoute.js'
 
 const app = express()
-const PORT = process.env.PORT || 6000
+const PORT = process.env.PORT || 5500
 dotenv.config()
 
 connectDB()
