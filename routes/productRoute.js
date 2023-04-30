@@ -1,10 +1,12 @@
 import express from 'express'
-import { protect } from '../middleware/authMiddleware'
-import { createProduct, updateProduct, deleteProduct, getProducts } from '../controllers/productController'
+import multer from 'multer'
+import { protect } from '../middleware/authMiddleware.js'
+import { createProduct, updateProduct, deleteProduct, getProducts } from '../controllers/productController.js'
+const upload = multer({ dest: 'uploads/'})
 const router = express.Router()
 
 router.route("/").get(protect, getProducts)
-router.route("/create").post(protect, createProduct)
+router.route("/create").post(protect, upload.single('image'), createProduct)
 router.route("/update/:id").put(protect, updateProduct)
 router.route("/delete/:id").delete(protect, deleteProduct)
 
