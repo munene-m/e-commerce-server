@@ -1,15 +1,40 @@
+import { v2 as cloudinary } from 'cloudinary'
 import asyncHandler from "express-async-handler"
-import products from "../models/products"
+import products from "../models/products.js"
+import multer from 'multer';
+
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, "uploads/");
+    },
+    filename: function (req, file, cb) {
+      cb(null, file.originalname);
+    },
+  });
+  
+  const upload = multer({ storage });
+
+cloudinary.config({
+    cloud_name: "doj335om4",
+    api_key: 522876894532472,
+    api_secret: "pZQf_dO0emYz0n5nzjdw38lpk4M"
+})
 
 //Create product
 export const createProduct = asyncHandler( async(req, res) =>{
-    const { name, description, price, image } = req.body
-    if(!name || !description || !price || !image) {
-        res.status(400)
-        throw new Error("Please enter all required fields")
-    }
+    const { name, description, price, quantity } = req.body
+    const image = req.file
+    const result = await cloudinary.uploader.upload(image.path, {
+        width: 500,
+        height: 500,
+        crop: 'fill'
+    })
+
     const product = await products.create({
-        name, description, price, image
+        name, description, price, quantity,  
+        image: result.secure_url, // Save the Cloudinary URL to the product document
+        imagePublicId: result.public_id // Save the public ID to the product document
     })
     if(product){
         res.status(201).json({
@@ -17,6 +42,7 @@ export const createProduct = asyncHandler( async(req, res) =>{
             name: product.name,
             description: product.description,
             price: product.price,
+            quantity: product.quantity,
             image: product.image
         })
     } else {
