@@ -25,7 +25,7 @@ cloudinary.config({
 
 //Create product
 export const createProduct = asyncHandler( async(req, res) =>{
-    const { name, description, price, quantity } = req.body
+    const { name, description, price, quantity, category } = req.body
     const image = req.file
     const result = await cloudinary.uploader.upload(image.path, {
         width: 500,
@@ -34,7 +34,7 @@ export const createProduct = asyncHandler( async(req, res) =>{
     })
 
     const product = await products.create({
-        name, description, price, quantity,  
+        name, description, price, quantity, category, 
         image: result.secure_url, // Save the Cloudinary URL to the product document
         imagePublicId: result.public_id // Save the public ID to the product document
     })
@@ -45,6 +45,7 @@ export const createProduct = asyncHandler( async(req, res) =>{
             description: product.description,
             price: product.price,
             quantity: product.quantity,
+            category: product.category,
             image: product.image,
             imagePublicId: product.imagePublicId
         })
@@ -60,7 +61,7 @@ export const updateProduct = asyncHandler(async (req,res) =>{
         res.status(400)
         throw new Error("The product you tried to update does not exist")
       }
-      const { name, description, quantity, price } = req.body
+      const { name, description, quantity, price, category } = req.body
       let image = product.image
       let imagePublicId = product.imagePublicId
       if (req.file) {
@@ -74,7 +75,7 @@ export const updateProduct = asyncHandler(async (req,res) =>{
         imagePublicId = result.public_id
       }
       const updatedProduct = await products.findByIdAndUpdate(req.params.id,
-        { name, description, quantity, price, image, imagePublicId },
+        { name, description, quantity, price, category, image, imagePublicId },
         { new: true }
       )
       res.status(200).json(updatedProduct);
@@ -90,6 +91,16 @@ export const getProducts = asyncHandler( async(req, res) =>{
     }
 } )
 
+export const getProductInCategory = asyncHandler(async (req, res) => {
+    const product = await products.find({category: decodeURIComponent(req.params.value)})
+    if(product.length === 0) {
+        res.status(400)
+        throw new Error("Product not found")
+    } else {
+        res.status(200).json(product)
+    }
+})
+
 export const deleteProduct = asyncHandler(async(req, res) => {
     const product = await products.findById(req.params.id);
     if(!product) {
@@ -100,4 +111,4 @@ export const deleteProduct = asyncHandler(async(req, res) => {
     res.status(200).json({ id: req.params.id })
 })
 
-export default { createProduct, updateProduct, deleteProduct, getProducts }
+export default { createProduct, updateProduct, deleteProduct, getProducts,  }
