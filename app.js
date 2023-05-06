@@ -5,6 +5,8 @@ import cors from 'cors';
 import { connectDB } from "./config/db.js"
 import authRoute from './routes/authRoutes.js'
 import productRoute from './routes/productRoute.js'
+import cartRoute from './routes/cartRoute.js'
+import paymentRoute from './routes/paymentRoute.js'
 
 const app = express()
 const PORT = process.env.PORT || 5500
@@ -18,6 +20,8 @@ app.use(bodyParser.json())
 
 app.use("/auth", authRoute)
 app.use("/products", productRoute)
+app.use("/cart", cartRoute)
+app.use("/pay", paymentRoute)
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
