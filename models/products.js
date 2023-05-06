@@ -22,6 +22,10 @@ const productSchema = mongoose.Schema({
         required: true,
         trim: true
     },
+    itemsInStock: {
+        type:Number,
+        required: true
+    },
     image: {
         type: String
     },
