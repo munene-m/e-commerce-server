@@ -69,7 +69,16 @@ export const loginUser = asyncHandler(async (req, res) => {
 
 //forgot password
 export const forgotPassword = asyncHandler(async (req, res) => {
+  const { email, password } = req.body
+  const user = await authModel.findOne({ email });
+  if(!user) {
+    res.status(404).json("User with that email does not exist")
+  }  
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
 
+  const updatedUser = await authModel.findOneAndUpdate(email, {password: hashedPassword}, { new: true });
+  res.status(200).json(updatedUser);
 });
 
 // update user details
