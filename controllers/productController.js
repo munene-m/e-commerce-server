@@ -25,16 +25,17 @@ cloudinary.config({
 
 //Create product
 export const createProduct = asyncHandler( async(req, res) =>{
-    const { name, description, price, quantity, category } = req.body
+    const { name, description, price, quantity, itemsInStock, category } = req.body
     const image = req.file
     const result = await cloudinary.uploader.upload(image.path, {
         width: 500,
         height: 500,
-        crop: 'fill'
+        crop: 'scale',
+        quality:50
     })
 
     const product = await products.create({
-        name, description, price, quantity, category, 
+        name, description, price, quantity, itemsInStock, category, 
         image: result.secure_url, // Save the Cloudinary URL to the product document
         imagePublicId: result.public_id // Save the public ID to the product document
     })
@@ -45,6 +46,7 @@ export const createProduct = asyncHandler( async(req, res) =>{
             description: product.description,
             price: product.price,
             quantity: product.quantity,
+            itemsInStock: product.itemsInStock,
             category: product.category,
             image: product.image,
             imagePublicId: product.imagePublicId
@@ -61,7 +63,7 @@ export const updateProduct = asyncHandler(async (req,res) =>{
         res.status(400)
         throw new Error("The product you tried to update does not exist")
       }
-      const { name, description, quantity, price, category } = req.body
+      const { name, description, quantity, itemsInStock, price, category } = req.body
       let image = product.image
       let imagePublicId = product.imagePublicId
       if (req.file) {
@@ -69,25 +71,36 @@ export const updateProduct = asyncHandler(async (req,res) =>{
         const result = await cloudinary.uploader.upload(req.file.path, {
           width: 500,
           height: 500,
-          crop: "fill",
+          crop: "scale",
+          quality: 60
         });
         image = result.secure_url
         imagePublicId = result.public_id
       }
       const updatedProduct = await products.findByIdAndUpdate(req.params.id,
-        { name, description, quantity, price, category, image, imagePublicId },
+        { name, description, quantity, itemsInStock, price, category, image, imagePublicId },
         { new: true }
       )
       res.status(200).json(updatedProduct);
 })
 
+export const getProduct = asyncHandler(async (req, res) => {
+    const product = await products.findById(req.params.id)
+    if(!product){
+        res.status(400)
+        throw new Error("This product does not exist")
+    } else {
+        res.status(200).json(product)
+    }
+})
+
 export const getProducts = asyncHandler( async(req, res) =>{
-    const products = await products.find()
-    if (!products) {
+    const product = await products.find()
+    if (!product) {
         res.status(400)
         throw new Error("There are no products in your store")
     } else {
-        res.status(200).json(products)
+        res.status(200).json(product)
     }
 } )
 
@@ -107,8 +120,8 @@ export const deleteProduct = asyncHandler(async(req, res) => {
         res.status(404);
         throw new Error("Product not found ");
     }
-    await products.findByIdAndDelete();
-    res.status(200).json({ id: req.params.id })
+    await products.findByIdAndDelete(req.params.id);
+    res.status(200).json({ id: req.params.id, message: "Item deleted" })
 })
 
-export default { createProduct, updateProduct, deleteProduct, getProducts,  }
+export default { createProduct, updateProduct, deleteProduct, getProducts,  getProduct}
