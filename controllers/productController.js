@@ -62,26 +62,28 @@ export const updateProduct = asyncHandler(async (req,res) =>{
     if(!product){
         res.status(400)
         throw new Error("The product you tried to update does not exist")
+      }else{
+        const { name, description, quantity, itemsInStock, price, category } = req.body
+        let image = product.image
+        let imagePublicId = product.imagePublicId
+        if (req.file) {
+          // If a new image is uploaded, update it in Cloudinary
+          const result = await cloudinary.uploader.upload(req.file.path, {
+            width: 500,
+            height: 500,
+            crop: "scale",
+            quality: 60
+          });
+          image = result.secure_url
+          imagePublicId = result.public_id
+        }
+        const updatedProduct = await products.findByIdAndUpdate(req.params.id,
+          { name, description, quantity, itemsInStock, price, category, image, imagePublicId },
+          { new: true }
+        )
+        res.status(200).json(updatedProduct);
       }
-      const { name, description, quantity, itemsInStock, price, category } = req.body
-      let image = product.image
-      let imagePublicId = product.imagePublicId
-      if (req.file) {
-        // If a new image is uploaded, update it in Cloudinary
-        const result = await cloudinary.uploader.upload(req.file.path, {
-          width: 500,
-          height: 500,
-          crop: "scale",
-          quality: 60
-        });
-        image = result.secure_url
-        imagePublicId = result.public_id
-      }
-      const updatedProduct = await products.findByIdAndUpdate(req.params.id,
-        { name, description, quantity, itemsInStock, price, category, image, imagePublicId },
-        { new: true }
-      )
-      res.status(200).json(updatedProduct);
+
 })
 
 export const getProduct = asyncHandler(async (req, res) => {
@@ -119,9 +121,11 @@ export const deleteProduct = asyncHandler(async(req, res) => {
     if(!product) {
         res.status(404);
         throw new Error("Product not found ");
+    }else{
+        await products.findByIdAndDelete(req.params.id);
+        res.status(200).json({ id: req.params.id, message: "Item deleted" })
     }
-    await products.findByIdAndDelete(req.params.id);
-    res.status(200).json({ id: req.params.id, message: "Item deleted" })
+
 })
 
 export default { createProduct, updateProduct, deleteProduct, getProducts,  getProduct}
