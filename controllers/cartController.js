@@ -3,8 +3,8 @@ import auth from "../models/auth.js";
 import asyncHandler from "express-async-handler"
 
 export const addProduct = asyncHandler(async(req,res) => {
-    const { productId, name, image, price, quantity } = req.body
-    if(!productId || !name || !image || !price || !quantity){
+    const { customer, productId, name, image, price, quantity } = req.body
+    if(!customer || !productId || !name || !image || !price || !quantity){
         res.status(400)
         throw new Error("Please enter all required fields")
     }
@@ -14,11 +14,12 @@ export const addProduct = asyncHandler(async(req,res) => {
         throw new Error("User not found");
     }
     const cartItems = await cart.create({
-        productId, name, image, price, quantity
+        customer, productId, name, image, price, quantity
     })
     if(cartItems) {
         res.status(200).json({
             _id: cartItems.id,
+            customer: cartItems.customer,
             productId: cartItems.productId,
             name: cartItems.name,
             price: cartItems.price,
@@ -41,7 +42,7 @@ export const updateProduct = asyncHandler(async(req, res) => {
 })
 
 export const getCart = asyncHandler(async(req,res) => {
-    const cartItems = await cart.find()
+    const cartItems = await cart.find({customer: decodeURIComponent(req.params.value)})
     if(!cartItems){
         res.status(400)
         throw new Error("There are no items in cart")
