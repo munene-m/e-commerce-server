@@ -48,7 +48,7 @@ export const loginUser = asyncHandler(async (req, res) => {
   if (!email || !password) {
     res.status(400);
     throw new Error("Please enter all the required fields");
-  }
+  } 
 
   const user = await authModel.findOne({ email });
 
@@ -69,16 +69,7 @@ export const loginUser = asyncHandler(async (req, res) => {
 
 //forgot password
 export const forgotPassword = asyncHandler(async (req, res) => {
-  const { email, password } = req.body
-  const user = await authModel.findOne({ email });
-  if(!user) {
-    res.status(404).json("User with that email does not exist")
-  }  
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt);
-
-  const updatedUser = await authModel.findOneAndUpdate(email, {password: hashedPassword}, { new: true });
-  res.status(200).json(updatedUser);
+ 
 });
 
 // update user details
@@ -88,10 +79,11 @@ export const updateUser = asyncHandler( async( req, res ) => {
   if(!user) {
       res.status(404);
       throw new Error("User does not exist");
+  }else{
+    const updatedUser = await authModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.status(200).json(updatedUser);
   }
 
-  const updatedUser = await authModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
-  res.status(200).json(updatedUser);
 });
 
 export const getCredentials = asyncHandler(async (req, res) => {
