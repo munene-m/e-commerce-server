@@ -1,6 +1,7 @@
 import bodyParser from 'body-parser';
 import express from 'express';
 import dotenv from 'dotenv';
+import helmet from 'helmet'
 import cors from 'cors';
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
@@ -19,6 +20,7 @@ app.use(express.json())
 app.use(cors())
 app.use(express.urlencoded({extended:false}))
 app.use(bodyParser.json())
+app.use(helmet())
 
 app.use("/auth", authRoute)
 app.use("/products", productRoute)
