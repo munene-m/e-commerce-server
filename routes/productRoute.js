@@ -9,7 +9,7 @@ router.route("/").get(getProducts)
 router.route("/create").post(protect, upload.single('image'), createProduct)
 router.route("/update/:id").put(protect, upload.single('image'), updateProduct)
 router.route("/product/:id").get(getProduct)
-router.route("/item/:value").get(protect, getProductInCategory)
+router.route("/item/:value").get(getProductInCategory)
 router.route("/delete/:id").delete(protect, deleteProduct)
 
 export default router
