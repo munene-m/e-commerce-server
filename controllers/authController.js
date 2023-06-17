@@ -32,13 +32,14 @@ export const registerUser = asyncHandler(async (req, res) => {
     const token = generateToken(user._id);
 
     // Create a session for the user
-    req.session.userId = user._id;
+    const sessionId = req.session.id;
+
 
     res.status(200).json({
       _id: user._id,
       username: user.username,
       email: user.email,
-      token
+      token, sessionId
     });
   } else {
     res.status(400);
@@ -64,13 +65,13 @@ export const loginUser = asyncHandler(async (req, res) => {
     const token = generateToken(user._id);
 
     // Create a session for the user
-    req.session.userId = user._id;
+    const sessionId = req.session.id;
 
     res.status(200).json({
       _id: user._id,
       username: user.username,
       email: user.email,
-      token
+      token, sessionId
     });
   }else {
     res.status(400);
