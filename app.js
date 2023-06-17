@@ -24,7 +24,7 @@ app.use(cors())
 app.use(express.urlencoded({extended:false}))
 app.use(bodyParser.json())
 app.use(helmet())
-app.use(morgan('tiny'));
+app.use(morgan('dev'));
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
