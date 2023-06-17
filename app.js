@@ -29,7 +29,7 @@ app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  store: MongoStore.create({ mongoUrl: process.env.MONGO_CONNECTION_URL}),
+  store: MongoStore.create({ mongoUrl: process.env.MONGO_CONNECTION_URL, collectionName: "ecommerce-sessions"}),
   cookie: {
       secure: true, // Set to true if using HTTPS
       httpOnly: true, // Ensures cookie is not accessible via client-side JavaScript
