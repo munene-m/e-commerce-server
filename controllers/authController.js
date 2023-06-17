@@ -27,13 +27,18 @@ export const registerUser = asyncHandler(async (req, res) => {
     password: hashedPassword,
   });
 
-  if (user) {
-    res.status(201);
-    res.json({
-      _id: user.id,
+  if (user && (await bcrypt.compare(password, user.password))) {
+    // Generate a token for the user
+    const token = generateToken(user._id);
+
+    // Create a session for the user
+    req.session.userId = user._id;
+
+    res.status(200).json({
+      _id: user._id,
       username: user.username,
       email: user.email,
-      token: generateToken(user._id),
+      token
     });
   } else {
     res.status(400);
@@ -55,13 +60,19 @@ export const loginUser = asyncHandler(async (req, res) => {
   //if the entered password and the one hashed in the database match, sign it using the JWT secret key and send it as a cookie
   //in the response and return other user details entered in json format
   if (user && (await bcrypt.compare(password, user.password))) {
+    // Generate a token for the user
+    const token = generateToken(user._id);
+
+    // Create a session for the user
+    req.session.userId = user._id;
+
     res.status(200).json({
-      _id: user.id,
+      _id: user._id,
       username: user.username,
       email: user.email,
-      token: generateToken(user._id),
+      token
     });
-  } else {
+  }else {
     res.status(400);
     throw new Error("The credentials you entered are invalid");
   }
