@@ -3,6 +3,9 @@ import express from 'express';
 import dotenv from 'dotenv';
 import helmet from 'helmet'
 import cors from 'cors';
+import morgan from 'morgan';
+import session from "express-session";
+import MongoStore from "connect-mongo";
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 import { connectDB } from "./config/db.js"
@@ -21,6 +24,18 @@ app.use(cors())
 app.use(express.urlencoded({extended:false}))
 app.use(bodyParser.json())
 app.use(helmet())
+app.use(morgan('combined'));
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({ mongoUrl: process.env.MONGO_CONNECTION_URL}),
+  cookie: {
+      secure: false, // Set to true if using HTTPS
+      httpOnly: true, // Ensures cookie is not accessible via client-side JavaScript
+      maxAge: 1000 * 60 * 60 * 24, // cookie will expire after 1 day (in milliseconds)
+  },
+}));
 
 app.use("/auth", authRoute)
 app.use("/products", productRoute)
