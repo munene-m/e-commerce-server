@@ -5,7 +5,7 @@ import { registerUser, loginUser, getCredentials, updatePassword, forgotPassword
 router.route("/credentials").get(protect, getCredentials)
 router.route("/register").post(registerUser)
 router.route("/login").post(loginUser)
-router.route("/update").upt(updatePassword)
+router.route("/update").put(updatePassword)
 router.route("/forgot-password").put(forgotPassword)
 router.route("/reset").post(resetPassword)
 // router.route("/oauth/callback").get(googleAuthCallback)
