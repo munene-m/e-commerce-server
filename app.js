@@ -28,7 +28,7 @@ app.use(morgan('dev'));
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
-  saveUninitialized: false,
+  saveUninitialized: true,
   store: MongoStore.create({ mongoUrl: process.env.MONGO_CONNECTION_URL, collectionName: "ecommerce-sessions"}),
   cookie: {
       secure: true, // Set to true if using HTTPS
